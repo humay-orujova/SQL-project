@@ -81,7 +81,7 @@ WITH age_list AS (
   FROM People
   GROUP BY Age_dist)
   
-  SELECT * FROM age_list;
+SELECT * FROM age_list;
 
 
 -- 2.	What is the average income of the customers, and how does it vary by education level or marital status?
