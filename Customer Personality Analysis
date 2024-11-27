@@ -1,0 +1,143 @@
+-- Cleaning NULLs from critical columns
+DELETE FROM marketing_campaign
+WHERE ID IS NULL
+OR Year_Birth IS NULL
+OR Income IS NULL;
+
+-- Seperating into smaller tables
+
+-- People table
+CREATE TABLE People (
+ID INT PRIMARY KEY,
+Year_Birth YEAR,
+Education VARCHAR(50),
+Marital_Status VARCHAR(50),
+Income FLOAT,
+Kidhome INT,
+Teenhome INT,
+Dt_customer DATE,
+Recency INT,
+Complain INT
+);
+
+INSERT INTO People (ID, Year_Birth, Education, Marital_Status, Income, Kidhome, Teenhome, Dt_customer, Recency, Complain)
+SELECT ID, Year_Birth, Education, Marital_Status, Income, Kidhome, Teenhome, Dt_customer, Recency, Complain
+FROM marketing_campaign;
+
+-- Products table
+CREATE TABLE Products (
+ID INT PRIMARY KEY,
+MntWines FLOAT,
+MntFruits FLOAT,
+MntMeatProducts FLOAT,
+MntFishProducts FLOAT,
+MntSweetProducts FLOAT,
+MntGoldProds FLOAT
+);
+
+INSERT INTO Products (ID, MntWines, MntFruits, MntMeatProducts, MntFishProducts, MntSweetProducts, MntGoldProds)
+SELECT ID, MntWines, MntFruits, MntMeatProducts, MntFishProducts, MntSweetProducts, MntGoldProds
+FROM marketing_campaign;
+
+-- Promotion table
+CREATE TABLE Promotion (
+ID INT PRIMARY KEY,
+NumDealsPurchases INT,
+AcceptedCmp1 INT,
+AcceptedCmp2 INT,
+AcceptedCmp3 INT,
+AcceptedCmp4 INT,
+AcceptedCmp5 INT,
+Response INT
+);
+
+INSERT INTO Promotion (ID, NumDealsPurchases, AcceptedCmp1, AcceptedCmp2, AcceptedCmp3, AcceptedCmp4, AcceptedCmp5, Response)
+SELECT ID, NumDealsPurchases, AcceptedCmp1, AcceptedCmp2, AcceptedCmp3, AcceptedCmp4, AcceptedCmp5, Response
+FROM marketing_campaign;
+
+-- Place table
+CREATE TABLE Place (
+ID INT PRIMARY KEY,
+NumWebPurchases INT,
+NumCatalogPurchases INT,
+NumStorePurchases INT,
+NumWebVisitsMonth INT
+);
+
+INSERT INTO Place (ID, NumWebPurchases, NumCatalogPurchases, NumStorePurchases, NumWebVisitsMonth)
+SELECT ID, NumWebPurchases, NumCatalogPurchases, NumStorePurchases, NumWebVisitsMonth
+FROM marketing_campaign;
+
+
+-- 1.	What is the age distribution of the customers?
+WITH age_list AS (
+  SELECT 
+    CASE 
+      WHEN strftime('%Y') - Year_Birth < 35 THEN 'Younger'
+      WHEN strftime('%Y') - Year_Birth BETWEEN 35 AND 54 THEN 'Middle'
+      ELSE 'Older'
+    END AS Age_dist, 
+    COUNT(*) AS Count
+  FROM People
+  GROUP BY Age_dist)
+  
+  SELECT * FROM age_list;
+
+
+-- 2.	What is the average income of the customers, and how does it vary by education level or marital status?
+
+-- Education level
+SELECT Education, 
+	   ROUND(AVG(Income), 2) AS AvgIncome, 
+       COUNT(ID) AS NumPeople
+FROM People
+GROUP BY Education
+ORDER BY AvgIncome DESC;
+
+-- Mariatl status
+SELECT Marital_Status, 
+	   ROUND(AVG(Income), 2) AS AvgIncome, 
+       COUNT(ID) as NumPeople
+FROM People
+GROUP BY Marital_Status
+ORDER BY AvgIncome DESC;
+
+
+-- 3.	What are the top 3 product categories by total spending?
+SELECT 'Wines' AS Category, SUM(MntWines) AS TotalSpending FROM Products
+UNION ALL
+SELECT 'Fruits', SUM(MntFruits) FROM Products
+UNION ALL
+SELECT 'Meat', SUM(MntMeatProducts) FROM Products
+UNION ALL
+SELECT 'Fish', SUM(MntFishProducts) FROM Products
+UNION ALL
+SELECT 'Sweets', SUM(MntSweetProducts) FROM Products
+UNION ALL
+SELECT 'Gold', SUM(MntGoldProds) FROM Products
+ORDER BY TotalSpending DESC
+LIMIT 3;
+
+
+-- 4.	Which channel (web, store, or catalog) is the most popular for purchases?
+SELECT 'Web' AS Channel, SUM(NumWebPurchases) AS TotalPurchases FROM Place
+UNION ALL
+SELECT 'Store', SUM(NumStorePurchases) FROM Place
+UNION ALL
+SELECT 'Catalog', SUM(NumCatalogPurchases) FROM Place
+ORDER BY TotalPurchases DESC;
+
+
+-- 5.	How does income level affect spending?
+SELECT
+ CASE
+  WHEn ppl.Income<40000 THEN 'LOW'
+  WHEN ppl.Income BETWEEN 40000 AND 120000 THEN 'MIDDLE'
+  ELSE 'HIGH'
+ END AS income_level,
+ ROUND(AVG(prod.MntWines + prod.MntFruits + prod.MntMeatProducts + prod.MntFishProducts + prod.MntSweetProducts + prod.MntGoldProds), 2) AS avg_spending
+FROM People AS ppl
+Inner JOIN Products AS prod 
+ON ppl.ID = prod.ID
+GROUP BY income_level
+ORDER BY avg_spending DESC;
