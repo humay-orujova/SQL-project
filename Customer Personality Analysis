@@ -121,12 +121,12 @@ LIMIT 3;
 
 
 -- 4.	Which channel (web, store, or catalog) is the most popular for purchases?
-SELECT 'Web' AS Channel, SUM(NumWebPurchases) AS TotalPurchases FROM Place
+SELECT 'Web' AS Channel, SUM(NumWebPurchases) AS total_purchases FROM Place
 UNION ALL
 SELECT 'Store', SUM(NumStorePurchases) FROM Place
 UNION ALL
 SELECT 'Catalog', SUM(NumCatalogPurchases) FROM Place
-ORDER BY TotalPurchases DESC;
+ORDER BY total_purchases DESC;
 
 
 -- 5.	How does income level affect spending?
@@ -145,6 +145,15 @@ ORDER BY avg_spending DESC;
 
 
 -- 6.	How do promotional responses (AcceptedCmp1 to AcceptedCmp5, Response) differ across customer segments (e.g., age segments)?
+WITH age_list AS (
+  SELECT ID, 
+    CASE 
+      WHEN strftime('%Y') - Year_Birth < 35 THEN 'Younger'
+      WHEN strftime('%Y') - Year_Birth BETWEEN 35 AND 54 THEN 'Middle'
+      ELSE 'Older'
+    END AS age_dist
+  FROM People)
+  
 SELECT age_list.age_dist AS "Age groups", 
 	   COUNT(prom.ID) AS "Total Customers", 
        ROUND(100.0*SUM(prom.AcceptedCmp1) / COUNT(prom.ID), 2) || '%' AS "Campaign 1 Rate",
@@ -157,3 +166,18 @@ FROM age_list
 INNER JOIN Promotion AS prom 
 ON age_list.ID = prom.ID
 GROUP BY age_list.age_dist;
+
+-- 7.	Are there patterns in recency and purchases?
+SELECT
+ CASE 
+  WHEN ppl.Recency <=30 THEN 'Recent'
+  WHEN ppl.Recency BETWEEN 31 AND 60 THEN 'Mid-recent'
+  ELSE 'Less recent'
+ end AS recency_group,
+ SUM(prod.MntWines + prod.MntFruits + prod.MntMeatProducts + prod.MntFishProducts + prod.MntSweetProducts + prod.MntGoldProds) AS total_spending,
+ COUNT(ppl.ID) AS num_people
+ FROM People AS ppl
+ INNER JOIN Products AS prod 
+ ON ppl.ID = prod.ID
+ GROUP BY recency_group
+ ORDER BY total_spending DESC;
