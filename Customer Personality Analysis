@@ -71,17 +71,18 @@ FROM marketing_campaign;
 
 -- 1.	What is the age distribution of the customers?
 WITH age_list AS (
-  SELECT 
+  SELECT ID, 
     CASE 
       WHEN strftime('%Y') - Year_Birth < 35 THEN 'Younger'
       WHEN strftime('%Y') - Year_Birth BETWEEN 35 AND 54 THEN 'Middle'
       ELSE 'Older'
-    END AS Age_dist, 
-    COUNT(*) AS Count
-  FROM People
-  GROUP BY Age_dist)
+    END AS age_dist
+  FROM People)
   
-SELECT * FROM age_list;
+SELECT age_dist, COUNT(*) AS Count
+FROM age_list
+GROUP BY age_dist
+ORDER BY Count DESC;
 
 
 -- 2.	What is the average income of the customers, and how does it vary by education level or marital status?
@@ -131,13 +132,28 @@ ORDER BY TotalPurchases DESC;
 -- 5.	How does income level affect spending?
 SELECT
  CASE
-  WHEn ppl.Income<40000 THEN 'LOW'
+  WHEN ppl.Income<40000 THEN 'LOW'
   WHEN ppl.Income BETWEEN 40000 AND 120000 THEN 'MIDDLE'
   ELSE 'HIGH'
  END AS income_level,
  ROUND(AVG(prod.MntWines + prod.MntFruits + prod.MntMeatProducts + prod.MntFishProducts + prod.MntSweetProducts + prod.MntGoldProds), 2) AS avg_spending
 FROM People AS ppl
-Inner JOIN Products AS prod 
+INNER JOIN Products AS prod 
 ON ppl.ID = prod.ID
 GROUP BY income_level
 ORDER BY avg_spending DESC;
+
+
+-- 6.	How do promotional responses (AcceptedCmp1 to AcceptedCmp5, Response) differ across customer segments (e.g., age segments)?
+SELECT age_list.age_dist AS "Age groups", 
+	   COUNT(prom.ID) AS "Total Customers", 
+       ROUND(100.0*SUM(prom.AcceptedCmp1) / COUNT(prom.ID), 2) || '%' AS "Campaign 1 Rate",
+       ROUND(100.0*SUM(prom.AcceptedCmp2) / COUNT(prom.ID), 2) || '%' AS "Campaign 2 Rate",
+       ROUND(100.0*SUM(prom.AcceptedCmp3) / COUNT(prom.ID), 2) || '%' AS "Campaign 3 Rate",
+       ROUND(100.0*SUM(prom.AcceptedCmp4) / COUNT(prom.ID), 2) || '%' AS "Campaign 4 Rate",
+       ROUND(100.0*SUM(prom.AcceptedCmp5) / COUNT(prom.ID), 2) || '%' AS "Campaign 5 Rate",
+       ROUND(100.0*SUM(prom.Response) / COUNT(prom.ID), 2) || '%' AS "Last Campaign Rate"
+FROM age_list
+INNER JOIN Promotion AS prom 
+ON age_list.ID = prom.ID
+GROUP BY age_list.age_dist;
