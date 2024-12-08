@@ -2,7 +2,7 @@
 
 ### Project Overview
 
-This project involved analyzing customer data from an online marketing campaign to uncover insights into customer behavior, spending patterns, and the effectiveness of promotional campaigns. Using SQL, I performed data cleaning, transformed the data into smaller, more manageable tables, and executed exploratory analyses to answer key business questions.
+This project involved analyzing customer data from an online marketing campaign with the goal of uncovering actionable insights into customer behavior, spending patterns, and the effectiveness of promotional campaigns. Using SQL, I performed data cleaning and transformation, splitting the data into smaller, more manageable tables for optimization. Through exploratory data analysis, I answered key business questions related to demographics, product spending, and customer engagement, providing valuable insights for targeted marketing strategies.
 
 ### Data source
 
