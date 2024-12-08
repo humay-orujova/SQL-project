@@ -1,4 +1,4 @@
-# SQL-project
+# Customer Personality Analysis
 
 ### Project Overview
 
