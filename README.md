@@ -21,13 +21,13 @@ Key data preparation steps included:
 ### Exploratory Data Analysis
 
 The analysis aimed to answer the following key business questions:
-- **Demographics:** What is the age distribution of customers?
-- **Income Analysis:** What is the average income by education level and marital status?
-- **Product Analysis:** Which product categories generate the highest total spending?
-- **Channel Preferences:** Which purchase channel (web, store, catalog) is the most popular?
-- **Income and Spending Patterns:** How does income level influence customer spending?
-- **Promotional Effectiveness:** How do customers in different age groups respond to promotional campaigns?
-- **Customer Engagement:** Are there patterns in customer recency and purchases?
+- What is the age distribution of customers?
+- What is the average income by education level and marital status?
+- Which product categories generate the highest total spending?
+- Which purchase channel (web, store, catalog) is the most popular?
+- How does income level influence customer spending?
+- How do customers in different age groups respond to promotional campaigns?
+- Are there patterns in customer recency and purchases?
 
 ### Results/Findings
 
