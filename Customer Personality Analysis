@@ -1,8 +1,20 @@
--- Cleaning NULLs from critical columns
+-- Cleaning the data
 DELETE FROM marketing_campaign
 WHERE ID IS NULL
 OR Year_Birth IS NULL
 OR Income IS NULL;
+
+UPDATE marketing_campaign
+set Marital_Status = 'Single'
+WHERE Marital_Status = 'Alone';
+
+UPDATE marketing_campaign
+set Marital_Status = 'Unknown'
+WHERE Marital_Status = 'Absurd';
+
+UPDATE marketing_campaign
+set Marital_Status = 'Unknown'
+WHERE Marital_Status = 'YOLO';
 
 -- Seperating into smaller tables
 
@@ -95,7 +107,7 @@ FROM People
 GROUP BY Education
 ORDER BY AvgIncome DESC;
 
--- Mariatl status
+-- Marital status
 SELECT Marital_Status, 
 	   ROUND(AVG(Income), 2) AS AvgIncome, 
        COUNT(ID) as NumPeople
@@ -167,7 +179,7 @@ INNER JOIN Promotion AS prom
 ON age_list.ID = prom.ID
 GROUP BY age_list.age_dist;
 
--- 7.	Are there patterns in recency and purchases?
+-- 7.	Are there patterns in Recency and purchases?
 SELECT
  CASE 
   WHEN ppl.Recency <=30 THEN 'Recent'
