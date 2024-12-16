@@ -15,7 +15,7 @@ This project involved analyzing customer data from an online marketing campaign 
 ### Data Cleaning/Preparation
 
 Key data preparation steps included:
-1. **Data Cleaning:** Removed NULL values from critical columns (e.g., customer ID, income, etc.), ensuring data integrity.
+1. **Data Cleaning:** Removed NULL values from important columns (e.g., customer ID, income) and corrected inconsistent values.
 2. **Data Transformation:** Split the original dataset into smaller tables (e.g., People, Products, Promotion, Place) to streamline analysis and optimize query performance. Each table focused on specific aspects of customer data, such as product spending, promotional responses, and purchase behavior.
 
 ### Exploratory Data Analysis
